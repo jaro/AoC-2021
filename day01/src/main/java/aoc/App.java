@@ -17,27 +17,36 @@ public class App {
     }
 
     public Integer getSolutionPart1() {
-        int result = 0;
-        for (int i=0;i<input.size();i++) {
-            if (isPrime(input.get(i))) {
-                result += (i*input.get(i));
+        int largerThanPrevious = 0;
+        int previous = input.get(0);
+
+        for(int i=1;i<input.size();i++) {
+            if (input.get(i) > previous) {
+                largerThanPrevious++;
             }
+            previous = input.get(i);
         }
-        return result;
+
+        return largerThanPrevious;
     }
 
     public Integer getSolutionPart2() {
-        int result = 0;
-        for (int i=0;i<input.size();i++) {
-            if (!isPrime(input.get(i))) {
-                if (i%2 == 0) {
-                    result += input.get(i);
-                } else {
-                    result -= input.get(i);
-                }
+        int largerThanPrevious = 0;
+        int previousSum = getSum(2);
+
+        for(int i=3;i<input.size();i++) {
+            int sum  = getSum(i);
+            if (sum > previousSum) {
+                largerThanPrevious++;
             }
+            previousSum = sum;
         }
-        return result;
+
+        return largerThanPrevious;
+    }
+
+    private int getSum(int lastIndex) {
+        return input.get(lastIndex-2) + input.get(lastIndex-1) + input.get(lastIndex);
     }
 
     public static void main(String[] args) throws IOException {
