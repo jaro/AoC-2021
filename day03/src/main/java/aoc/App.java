@@ -8,11 +8,12 @@ import java.util.stream.Collectors;
 
 public class App {
     public static Integer getSolutionPart1(final List<String> input) {
-        int[] gammaAndEpsilon = getGammaAndEpsilon(input);
-        return gammaAndEpsilon[0] * gammaAndEpsilon[1];
+        System.out.println("Mask: " + Integer.toBinaryString((1 << input.get(0).length())-1));
+        int gamma = getGamma(input); int epsilon = ~gamma & (1 << input.get(0).length())-1;
+        return gamma * epsilon;
     }
 
-    private static int[] getGammaAndEpsilon(List<String> list) {
+    private static int getGamma(List<String> list) {
         var size = list.get(0).length();
         int[] count = new int[size];
         for (String cmd : list) {
@@ -23,24 +24,21 @@ public class App {
             }
         }
 
-        int gamma=0, epsilon=0, lenght = list.size();
+        int gamma=0, lenght = list.size();
 
         for (int pos=0; pos<count.length;pos++) {
             if (count[pos] >= lenght-count[pos]) {
                 gamma += 0b1 << count.length-1-pos;
-            } else {
-                epsilon += 0b1 << count.length-1-pos;
             }
         }
 
-        return new int[]{gamma, epsilon};
+        return gamma;
     }
 
     public static Integer getSolutionPart2(final List<String> input) {
         int oxygen = 0, CO2 = 0, reportLength = input.get(0).length();
 
-        var StringValues = getGammaAndEpsilon(input);
-        char[] gammaSign = binaryToCharArr(StringValues[0], reportLength);
+        char[] gammaSign = binaryToCharArr(getGamma(input), reportLength);
 
         List<String> list = new ArrayList<>(input);
 
@@ -53,8 +51,7 @@ public class App {
             }
             list = keep;
 
-            StringValues = getGammaAndEpsilon(list);
-            gammaSign = binaryToCharArr(StringValues[0], reportLength);
+            gammaSign = binaryToCharArr(getGamma(list), reportLength);
 
             if (list.size() == 1) {
                 oxygen = Integer.parseInt(list.get(0), 2);
@@ -64,8 +61,7 @@ public class App {
 
         list = new ArrayList<>(input);
 
-        StringValues = getGammaAndEpsilon(input);
-        var epsilonSign = binaryToCharArr(StringValues[1], reportLength);
+        var epsilonSign = binaryToCharArr(~getGamma(input) & (1 << input.get(0).length())-1, reportLength);
 
         for (int pos=0;pos < epsilonSign.length;pos++) {
             List<String> keep = new ArrayList<>();
@@ -76,8 +72,7 @@ public class App {
             }
 
             list = keep;
-            StringValues = getGammaAndEpsilon(list);
-            epsilonSign = binaryToCharArr(StringValues[1], reportLength);
+            epsilonSign = binaryToCharArr(~getGamma(list) & (1 << list.get(0).length())-1, reportLength);
 
             if (list.size() == 1) {
                 CO2 = Integer.parseInt(list.get(0), 2);
