@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 
 public class App {
     public static Integer getSolutionPart1(final List<String> input) {
-        System.out.println("Mask: " + Integer.toBinaryString((1 << input.get(0).length())-1));
         int gamma = getGamma(input); int epsilon = ~gamma & (1 << input.get(0).length())-1;
         return gamma * epsilon;
     }
@@ -18,18 +17,14 @@ public class App {
         int[] count = new int[size];
         for (String cmd : list) {
             for (int pos=0;pos<size;pos++) {
-                if (cmd.charAt(pos) == '1') {
-                    count[pos] = count[pos]+1;
-                }
+                if (cmd.charAt(pos) == '1') count[pos] = count[pos]+1;
             }
         }
 
         int gamma=0, lenght = list.size();
 
         for (int pos=0; pos<count.length;pos++) {
-            if (count[pos] >= lenght-count[pos]) {
-                gamma += 0b1 << count.length-1-pos;
-            }
+            if (count[pos] >= lenght-count[pos]) gamma += 0b1 << count.length-1-pos;
         }
 
         return gamma;
@@ -45,9 +40,7 @@ public class App {
         for (int pos=0;pos < gammaSign.length;pos++) {
             List<String> keep = new ArrayList<>();
             for (String row: list) {
-                if (gammaSign[pos] == row.charAt(pos)) {
-                    keep.add(row);
-                }
+                if (gammaSign[pos] == row.charAt(pos)) keep.add(row);
             }
             list = keep;
 
@@ -66,9 +59,7 @@ public class App {
         for (int pos=0;pos < epsilonSign.length;pos++) {
             List<String> keep = new ArrayList<>();
             for (String row: list) {
-                if (epsilonSign[pos] == row.charAt(pos)) {
-                    keep.add(row);
-                }
+                if (epsilonSign[pos] == row.charAt(pos)) keep.add(row);
             }
 
             list = keep;
