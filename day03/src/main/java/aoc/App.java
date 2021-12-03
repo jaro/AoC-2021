@@ -7,20 +7,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class App {
-    private final List<String> input;
-    public App(List<String> input) { this.input = input; }
-
-    public Integer getSolutionPart1() {
-        int gamma = 0; int epsilon = 0;
-
-        String[] values = getGammaAndEpsilon(input);
-        gamma = Integer.parseInt(values[0], 2);
-        epsilon = Integer.parseInt(values[1], 2);
-
-        return gamma * epsilon;
+    public static Integer getSolutionPart1(final List<String> input) {
+        int[] gammaAndEpsilon = getGammaAndEpsilon(input);
+        return gammaAndEpsilon[0] * gammaAndEpsilon[1];
     }
 
-    private String[] getGammaAndEpsilon(List<String> list) {
+    private static int[] getGammaAndEpsilon(List<String> list) {
         var size = list.get(0).length();
         int[] count = new int[size];
         for (String cmd : list) {
@@ -31,33 +23,24 @@ public class App {
             }
         }
 
-        String gamma = "";
-        String epsilon = "";
-        int lenght = list.size();
-        for (int i:count) {
-            int ones = i;
-            int zeroes = lenght-i;
+        int gamma=0, epsilon=0, lenght = list.size();
 
-            if (i >= zeroes) {
-                gamma = gamma + "1";
-                epsilon = epsilon + "0";
+        for (int pos=0; pos<count.length;pos++) {
+            if (count[pos] >= lenght-count[pos]) {
+                gamma += 0b1 << count.length-1-pos;
             } else {
-                gamma = gamma + "0";
-                epsilon = epsilon + "1";
+                epsilon += 0b1 << count.length-1-pos;
             }
         }
 
-        return new String[] {gamma, epsilon};
+        return new int[]{gamma, epsilon};
     }
 
-    public Integer getSolutionPart2() {
-        int oxygen = 0;
-        int CO2 = 0;
+    public static Integer getSolutionPart2(final List<String> input) {
+        int oxygen = 0, CO2 = 0, reportLength = input.get(0).length();
 
-        var values = getGammaAndEpsilon(input);
-        char[] gammaSign = values[0].toCharArray();
-        System.out.println("List: " + input);
-        System.out.println("Gamma: " + String.valueOf(gammaSign));
+        var StringValues = getGammaAndEpsilon(input);
+        char[] gammaSign = binaryToCharArr(StringValues[0], reportLength);
 
         List<String> list = new ArrayList<>(input);
 
@@ -69,10 +52,10 @@ public class App {
                 }
             }
             list = keep;
-            values = getGammaAndEpsilon(list);
-            gammaSign = values[0].toCharArray();
-            System.out.println("List: " + keep);
-            System.out.println("Gamma: " + String.valueOf(gammaSign));
+
+            StringValues = getGammaAndEpsilon(list);
+            gammaSign = binaryToCharArr(StringValues[0], reportLength);
+
             if (list.size() == 1) {
                 oxygen = Integer.parseInt(list.get(0), 2);
                 break;
@@ -80,9 +63,9 @@ public class App {
         }
 
         list = new ArrayList<>(input);
-        values = getGammaAndEpsilon(input);
-        var epsilonSign = values[1].toCharArray();
 
+        StringValues = getGammaAndEpsilon(input);
+        var epsilonSign = binaryToCharArr(StringValues[1], reportLength);
 
         for (int pos=0;pos < epsilonSign.length;pos++) {
             List<String> keep = new ArrayList<>();
@@ -93,24 +76,25 @@ public class App {
             }
 
             list = keep;
-            values = getGammaAndEpsilon(list);
-            epsilonSign = values[1].toCharArray();
-            System.out.println("List: " + keep);
-            System.out.println("Epsilon: " + String.valueOf(epsilonSign));
+            StringValues = getGammaAndEpsilon(list);
+            epsilonSign = binaryToCharArr(StringValues[1], reportLength);
+
             if (list.size() == 1) {
                 CO2 = Integer.parseInt(list.get(0), 2);
                 break;
             }
         }
 
-        System.out.println("Oxygen: " + oxygen);
-        System.out.println("CO2 " + CO2);
-
         return oxygen * CO2;
     }
+
+    private static char[] binaryToCharArr(int value, int size) {
+        return String.format("%"+size+"s", Integer.toBinaryString(value)).replace(' ', '0').toCharArray();
+    }
+
     public static void main(String[] args) throws IOException {
         List<String> input = parseInput("input.txt"); String part = System.getenv("part") == null ? "part1" : System.getenv("part");
-        if (part.equals("part2")) {System.out.println(new App(input).getSolutionPart2());} else {System.out.println(new App(input).getSolutionPart1());}
+        if (part.equals("part2")) {System.out.println(getSolutionPart2(input));} else {System.out.println(getSolutionPart1(input));}
     }
     private static List<String> parseInput(String filename) throws IOException {
         return Files.lines(Path.of(filename)) .collect(Collectors.toList());
