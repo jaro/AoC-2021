@@ -31,9 +31,6 @@ public class App {
             var coordinates = line.split("->");
             Point point = new Point(coordinates[0], coordinates[1]);
             map.points.add(point);
-
-            System.out.println(point.toString());
-            System.out.println("Ortogonal: " + point.isOrogonal() + " - Diagonal: " + point.isDiagonal());
         }
 
         return map;
@@ -61,17 +58,6 @@ class Point {
         return Math.abs(endX-startX) == Math.abs(endY-startY);
     }
 
-    void normalize() {
-        if (startX > endX || startY > endY) {
-            int tmpX = endX;
-            endX = startX;
-            startX = tmpX;
-            int tmpY = endY;
-            endY = startY;
-            startY = tmpY;
-        }
-    }
-
     public String toString() {
         return "("+startX+","+startY+"->"+endX+","+endY+")";
     }
@@ -90,44 +76,27 @@ class Map {
     void process(boolean useDiagonals) {
         coordinates = new int[size][size];
         for (Point point : points) {
-            if (point.isOrogonal()) {
-                point.normalize();
+            if (point.isOrogonal() || (useDiagonals && point.isDiagonal())) {
                 plot(point);
             }
-
-            if (useDiagonals && point.isDiagonal()) {
-                plotDiagonal(point);
-            }
         }
     }
 
-    void plot(Point point){
-        for (int y = point.startY; y <= point.endY; y++) {
-            for (int x = point.startX; x <= point.endX; x++) {
-                coordinates[x][y] = coordinates[x][y] + 1;
-            }
-        }
-    }
-
-    void plotDiagonal(Point point){
+    void plot(Point point) {
         int x = point.startX;
         int y = point.startY;
-        int steps = Math.abs(point.endX-point.startX);
 
-        for(int s=0;s<steps;s++) {
+        while (x != point.endX || y != point.endY) {
             coordinates[x][y] = coordinates[x][y] + 1;
 
-            if (point.startX > point.endX) {
-                x--;
-            } else {
-                x++;
+            if (x != point.endX) {
+                x = (x>point.endX) ? x-1 : x+1;
             }
-            if (point.startY > point.endY) {
-                y--;
-            } else {
-                y++;
+            if (y != point.endY) {
+                y = (y>point.endY) ? y-1 : y+1;
             }
         }
+        coordinates[x][y] = coordinates[x][y] + 1;
     }
 
     int getOverlaps() {
@@ -140,14 +109,5 @@ class Map {
             }
         }
         return overlaps;
-    }
-
-    void showMap() {
-        for (int y=0;y<coordinates.length;y++) {
-            for (int x=0;x<coordinates.length;x++) {
-                System.out.print(coordinates[x][y]);
-            }
-            System.out.println("");
-        }
     }
 }
