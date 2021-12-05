@@ -9,23 +9,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class AppTest {
-    static Game game;
+    static Map map;
 
     @BeforeAll static void init() throws IOException{
-        game = App.parseInput("testinput.txt");
+        map = App.parseInput("testinput.txt", 10);
     }
 
     @Test void part1SumsInput() {
-        assertEquals(4512, App.getSolutionPart1(game));
+        assertEquals(5, App.getSolutionPart1(map));
     }
 
     @Test void part2MultipliesInput() {
-        assertEquals(1924, App.getSolutionPart2(game));
+        assertEquals(12, App.getSolutionPart2(map));
     }
-
-
 }
