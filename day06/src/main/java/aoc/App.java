@@ -2,24 +2,52 @@ package aoc;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class App {
     static List<Integer> input;
 
     public static Long getSolutionPart1(int days) {
-        Ecosystem system = new Ecosystem(input);
-        system.print();
-        return system.calculateDays(days);
+        var app = new App();
+        var list = Arrays.asList(3,4,3,1,2);
+        //var list = Arrays.asList(4,2,4,1,5,1,2,2,4,1,1,2,2,2,4,4,1,2,1,1,4,1,2,1,2,2,2,2,5,2,2,3,1,4,4,4,1,2,3,4,4,5,4,3,5,1,2,5,1,1,5,5,1,4,4,5,1,3,1,4,5,5,5,4,1,2,3,4,2,1,2,1,2,2,1,5,5,1,1,1,1,5,2,2,2,4,2,4,2,4,2,1,2,1,2,4,2,4,1,3,5,5,2,4,4,2,2,2,2,3,3,2,1,1,1,1,4,3,2,5,4,3,5,3,1,5,5,2,4,1,1,2,1,3,5,1,5,3,1,3,1,4,5,1,1,3,2,1,1,1,5,2,1,2,4,2,3,3,2,3,5,1,5,1,2,1,5,2,4,1,2,4,4,1,5,1,1,5,2,2,5,5,3,1,2,2,1,1,4,1,5,4,5,5,2,2,1,1,2,5,4,3,2,2,5,4,2,5,4,4,2,3,1,1,1,5,5,4,5,3,2,5,3,4,5,1,4,1,1,3,4,4,1,1,5,1,4,1,2,1,4,1,1,3,1,5,2,5,1,5,2,5,2,5,4,1,1,4,4,2,3,1,5,2,5,1,5,2,1,1,1,2,1,1,1,4,4,5,4,4,1,4,2,2,2,5,3,2,4,4,5,5,1,1,1,1,3,1,2,1);
+        long count = 0;
+        for(int i : list) {
+            System.out.println("Fish " + i);
+            int[] p = new int[2];
+            p[0] = i;
+            p[1] = 256;
+            count += app.countDays(p);
+        }
+
+        System.out.println(count);
+        return count;
+    }
+
+    public static long run() {
+        final List<Long> lanternfishLifecycle = Arrays.asList(0L,0L,0L,0L,0L,0L,0L,0L,0L);
+        var list = Arrays.asList(4,2,4,1,5,1,2,2,4,1,1,2,2,2,4,4,1,2,1,1,4,1,2,1,2,2,2,2,5,2,2,3,1,4,4,4,1,2,3,4,4,5,4,3,5,1,2,5,1,1,5,5,1,4,4,5,1,3,1,4,5,5,5,4,1,2,3,4,2,1,2,1,2,2,1,5,5,1,1,1,1,5,2,2,2,4,2,4,2,4,2,1,2,1,2,4,2,4,1,3,5,5,2,4,4,2,2,2,2,3,3,2,1,1,1,1,4,3,2,5,4,3,5,3,1,5,5,2,4,1,1,2,1,3,5,1,5,3,1,3,1,4,5,1,1,3,2,1,1,1,5,2,1,2,4,2,3,3,2,3,5,1,5,1,2,1,5,2,4,1,2,4,4,1,5,1,1,5,2,2,5,5,3,1,2,2,1,1,4,1,5,4,5,5,2,2,1,1,2,5,4,3,2,2,5,4,2,5,4,4,2,3,1,1,1,5,5,4,5,3,2,5,3,4,5,1,4,1,1,3,4,4,1,1,5,1,4,1,2,1,4,1,1,3,1,5,2,5,1,5,2,5,2,5,4,1,1,4,4,2,3,1,5,2,5,1,5,2,1,1,1,2,1,1,1,4,4,5,4,4,1,4,2,2,2,5,3,2,4,4,5,5,1,1,1,1,3,1,2,1);
+
+        list.forEach(stage -> lanternfishLifecycle.set(stage, lanternfishLifecycle.get(stage) + 1 ));
+
+        long count = new App().simulate(lanternfishLifecycle, 256);
+        System.out.println(count);
+
+        return count;
+    }
+
+    public long simulate(final List<Long> lanternfishLifecycle, final int numberOfDays) {
+        IntStream.rangeClosed(1, numberOfDays).forEach(day -> {
+            Collections.rotate(lanternfishLifecycle, -1);
+            lanternfishLifecycle.set(6, lanternfishLifecycle.get(6) + lanternfishLifecycle.get(8));
+        });
+        return lanternfishLifecycle.stream().reduce(Long::sum).orElseThrow();
     }
 
     public static Long getSolutionPart2(int days) {
         Ecosystem system = new Ecosystem(input);
-        system.print();
         return system.calculateDays(days);
     }
 
@@ -35,6 +63,28 @@ public class App {
 
         return ages;
     }
+
+    public long countDays(int[] params) {
+        //System.out.println("day: " + params[1] + " - life: " + params[0]);
+        if (params[1] == 0)
+            return 1;
+        else
+        if (params[0] > 0) {
+            var p = new int[2];
+            p[0] = params[0]-1;
+            p[1] = params[1]-1;
+            return countDays(p);
+        } else {
+            var p = new int[2];
+            p[0] = 6;
+            p[1] = params[1]-1;
+
+            var p2 = new int[2];
+            p2[0] = 8;
+            p2[1] = params[1]-1;
+            return countDays(p) + countDays(p2);
+        }
+    }
 }
 
 class Fish {
@@ -44,20 +94,16 @@ class Fish {
         this.timer = timer;
     }
 
-    Optional<Fish> addDay() {
-        Optional<Fish> fish = Optional.empty();
-
-        if (timer-- == 0) {
-            timer = 6;
-            Fish newFish = new Fish(8);
-            fish = Optional.of(newFish);
-        }
-
-        return fish;
-    }
-
-    public String toString() {
-        return timer + ",";
+    long countDays(int days) {
+        if (days == 0)
+            return 1;
+        else
+            if (timer-- > 0) {
+                return countDays(days - 1);
+            } else {
+                timer = 6;
+                return new Fish(8).countDays(days -1) + countDays(days - 1);
+            }
     }
 }
 
@@ -71,23 +117,12 @@ class Ecosystem {
     }
 
     long calculateDays(int days) {
-        for (int day=0;day<days;day++) {
-            List<Fish> newFishList = new ArrayList<>();
+        long count = 0;
 
-            for (Fish fish : fishList) {
-                var newFish = fish.addDay();
-                if (newFish.isPresent()) {
-                    newFishList.add(newFish.get());
-                }
-            }
-            fishList.addAll(newFishList);
-            //print();
+        for (Fish fish : fishList) {
+           count += fish.countDays(days);
         }
-        return fishList.size();
-    }
 
-    void print() {
-        fishList.stream().forEach(System.out::print);
-        System.out.println("");
+        return count;
     }
 }

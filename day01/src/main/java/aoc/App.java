@@ -16,6 +16,28 @@ public class App {
         this.input = input;
     }
 
+    public long countDays(int[] params) {
+        //System.out.println("day: " + params[1] + " - life: " + params[0]);
+        if (params[1] == 0)
+            return 1;
+        else
+        if (params[0] > 0) {
+            var p = new int[2];
+            p[0] = params[0]-1;
+            p[1] = params[1]-1;
+            return countDays(p);
+        } else {
+            var p = new int[2];
+            p[0] = 6;
+            p[1] = params[1]-1;
+
+            var p2 = new int[2];
+            p2[0] = 8;
+            p2[1] = params[1]-1;
+            return countDays(p) + countDays(p2);
+        }
+    }
+
     public Integer getSolutionPart1() {
         int largerThanPrevious = 0;
         int previous = input.get(0);

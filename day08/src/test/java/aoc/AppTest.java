@@ -10,20 +10,16 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class AppTest {
-    static List<Integer> input = Arrays.asList(3,4,3,1,2);
 
-    @BeforeAll static void init() {App.input = input;}
-
-    @Test void part1() {
-        App.input = Arrays.asList(1);
-        assertEquals(4, App.getSolutionPart1(11));
+    @BeforeAll static void init() throws IOException {
+        App.input = App.parseInput("testinput.txt");
     }
 
     @Test void part1SumsInput() {
-        assertEquals(5934, App.getSolutionPart1(80));
+        assertEquals(26, App.getSolutionPart1());
     }
 
     @Test void part2MultipliesInput() {
-        assertEquals(26984457539l, App.run());
+        assertEquals(61229, App.getSolutionPart2());
     }
 }
