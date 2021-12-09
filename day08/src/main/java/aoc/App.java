@@ -101,8 +101,10 @@ class Row {
     Map<String, Integer> getMapping() {
         Map<String, String> mapping = new HashMap<>();
         String seg1 = "";
-        String seg7 = "";
+        String seg3 = "";
         String seg4 = "";
+        String seg7 = "";
+
         String seg8 = "";
 
         for (Digit d : input) {
@@ -128,7 +130,8 @@ class Row {
         //Find g, d and b
         for (Digit dig : input) {
             if (dig.segments.length() == 5 && dig.segments.contains(first) && dig.segments.contains(second)) {
-                g = remove(remove(dig.segments, seg4), a);
+                seg3 = dig.segments;
+                g = remove(remove(seg3, seg4), a);
                 mapping.put("g", g);
                 d = remove(remove(remove(dig.segments, seg1), a), g);
                 mapping.put("d", d);
@@ -140,7 +143,7 @@ class Row {
 
 
         for (Digit dig : input) {
-            if (dig.segments.length() == 5 && dig.segments.contains(mapping.get("b"))) {
+            if (dig.segments.length() == 5 && dig.segments.contains(b)) { // Find 5
                 f = remove(remove(remove(remove(dig.segments, a), d), g), b);
                 mapping.put("f", f);
                 c = remove(seg1, f);
@@ -161,7 +164,7 @@ class Row {
         System.out.println("g->" + mapping.get("g"));
 
         Map<String, Integer> result = new HashMap<>();
-        String zero = a+b+d+e+f+g;
+        String zero = a+b+c+e+f+g;
         String one = seg1;
         String two = a+c+d+e+g;
         String three = a+c+d+f+g;
