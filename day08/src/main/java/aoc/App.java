@@ -1,5 +1,4 @@
 package aoc;
-import org.checkerframework.checker.units.qual.A;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -42,7 +41,6 @@ public class App {
             for (Digit dig : row.output) {
                 s += String.valueOf(mapping.get(dig.segments));
             }
-            System.out.println("Number: " + s);
             sum += Integer.parseInt(s);
         }
 
@@ -153,16 +151,6 @@ class Row {
             }
         }
 
-
-        System.out.println("1: " + seg1 + ", 7: " + seg7 + ", " + ", 4: " + seg4 + ", 8: " + seg8);
-        System.out.println("a->" + mapping.get("a"));
-        System.out.println("b->" + mapping.get("b"));
-        System.out.println("c->" + mapping.get("c"));
-        System.out.println("d->" + mapping.get("d"));
-        System.out.println("e->" + mapping.get("e"));
-        System.out.println("f->" + mapping.get("f"));
-        System.out.println("g->" + mapping.get("g"));
-
         Map<String, Integer> result = new HashMap<>();
         String zero = a+b+c+e+f+g;
         String one = seg1;
@@ -205,40 +193,7 @@ class Row {
     }
 }
 
-/*
-  0:      1:      2:      3:      4:
- aaaa    ....    aaaa    aaaa    ....
-b    c  .    c  .    c  .    c  b    c
-b    c  .    c  .    c  .    c  b    c
- ....    ....    dddd    dddd    dddd
-e    f  .    f  e    .  .    f  .    f
-e    f  .    f  e    .  .    f  .    f
- gggg    ....    gggg    gggg    ....
-
-  5:      6:      7:      8:      9:
- aaaa    aaaa    aaaa    aaaa    aaaa
-b    .  b    .  .    c  b    c  b    c
-b    .  b    .  .    c  b    c  b    c
- dddd    dddd    ....    dddd    dddd
-.    f  e    f  .    f  e    f  .    f
-.    f  e    f  .    f  e    f  .    f
- gggg    gggg    ....    gggg    gggg
- */
-
-// a finns i 0, 2, 3, 5, 6, 7, 8, 9
-// b finns i 0, 4, 5, 6, 8, 9
-// c finns i 0, 1, 2, 3, 4, 7, 8, 9
-// d finns i 2, 3, 4, 5, 6, 8, 9
-// e finns i 0, 2, 6, 8
-// f finns i 0, 1, 3, 4, 5, 6, 7, 8, 9
-
 class Digit {
-    // 1 = 2 segments
-    // 7 = 3 segments
-    // 4 = 4 segments
-    // 8 = 7 segments
-    // 2, 3, 5 = 5 segments
-    // 0, 6, 9 = 6 segments
     String segments;
     int digit = -1;
     List<Integer> possibleDigit = new ArrayList<>();
