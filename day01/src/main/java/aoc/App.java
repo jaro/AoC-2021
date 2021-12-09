@@ -17,7 +17,6 @@ public class App {
     }
 
     public long countDays(int[] params) {
-        //System.out.println("day: " + params[1] + " - life: " + params[0]);
         if (params[1] == 0)
             return 1;
         else
