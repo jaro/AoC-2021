@@ -16,7 +16,7 @@ public class AppTest {
     }
 
     @Test void part1SumsInput() {
-        assertEquals(10, App.getSolutionPart1());
+        assertEquals(226, App.getSolutionPart1());
     }
 
     @Test void part2MultipliesInput() {

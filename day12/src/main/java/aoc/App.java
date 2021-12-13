@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class App {
@@ -11,11 +12,14 @@ public class App {
 
     public static int getSolutionPart1() {
         var graph = buildGraph();
+        var visited = new HashSet<String>();
+        visited.add("start");
+        var paths = dfs(graph.start, visited);
 
-        var paths = dfs(graph.start, graph.end);
+        //paths.stream().forEach(System.out::println);
 
-        paths.stream().forEach(System.out::println);
-        return paths.size();
+        var fullPaths = paths.stream().filter(s -> s.startsWith("end")).collect(Collectors.toList());
+        return fullPaths.size();
     }
 
     public static long getSolutionPart2() {
@@ -56,23 +60,20 @@ public class App {
         return graph;
     }
 
-    static List<String> dfs(Node startNode, Node target) {
+    static List<String> dfs(Node startNode, Set<String> visited) {
         List<String> result = new ArrayList<>();
-        startNode.setVisited();
 
-        var adjacent = startNode.getUnvisitedAdjacent();
+        var adjacent = startNode.getUnvisitedAdjacent(visited);
 
-        if (startNode == target || adjacent.isEmpty()) {
+        if (adjacent.isEmpty() || "end".equals(startNode.name)) {
             var path = new ArrayList<String>();
-            path.add("->" + startNode.name);
+            path.add(startNode.name);
             return path;
         }
 
         for (Node next : adjacent) {
-            if (!next.isVisited()) {
-                var path = dfs(next, target);
-                result.addAll(path.stream().map(l -> new String(l + "->" +startNode.name)).collect(Collectors.toList()));
-            }
+            var path = dfs(next, next.updateVisited(new HashSet<>(visited)));
+            result.addAll(path.stream().map(l -> new String(l + "-" +startNode.name)).collect(Collectors.toList()));
         }
         return result;
     }
@@ -91,25 +92,21 @@ class Node {
     List<Node> adjacent = new ArrayList<>();
     String name;
     boolean bigCave = false;
-    private boolean isVisited = false;
 
     Node(String name) {
         this.name = name;
         bigCave = name.equals(name.toUpperCase());
     }
 
-    List<Node> getUnvisitedAdjacent() {
-        return adjacent.stream().filter(n -> !n.isVisited).collect(Collectors.toList());
+    List<Node> getUnvisitedAdjacent(Set<String> visited) {
+        return adjacent.stream().filter(Predicate.not(n -> visited.contains(n.name))).collect(Collectors.toList());
     }
 
-    public boolean isVisited() {
-        return isVisited;
-    }
+    public Set<String> updateVisited(Set<String> visited) {
+        if(!bigCave)
+            visited.add(name);
 
-    public void setVisited() {
-        if(bigCave || name.equals("end"))
-            return;
-        isVisited = true;
+        return visited;
     }
 }
 
