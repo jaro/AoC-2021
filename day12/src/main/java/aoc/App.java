@@ -11,23 +11,28 @@ public class App {
     static List<String> input;
 
     public static int getSolutionPart1() {
-        var graph = buildGraph();
+        var graph = buildGraph(false);
         var visited = new HashSet<String>();
         visited.add("start");
-        var paths = dfs(graph.start, visited);
 
-        //paths.stream().forEach(System.out::println);
-
-        var fullPaths = paths.stream().filter(s -> s.startsWith("end")).collect(Collectors.toList());
+        var fullPaths = dfs(graph.start, visited).stream().filter(s -> s.endsWith("end")).collect(Collectors.toList());
         return fullPaths.size();
     }
 
     public static long getSolutionPart2() {
-        return 0;
+        var graph = buildGraph(true);
+        var visited = new HashSet<String>();
+        var allPaths = new HashSet<String>();
+        visited.add("start");
+
+        do {
+            allPaths.addAll(dfs(graph.start, visited).stream().filter(s -> s.endsWith("end")).collect(Collectors.toList()));
+        } while(graph.nextSmallCave());
+
+        return allPaths.size();
     }
 
-    static Graph buildGraph() {
-        Graph graph = new Graph();
+    static Graph buildGraph(boolean visitSmalCaveTwice) {
         Map<String, Node> nodes = new HashMap<>();
 
         for (String row : input) {
@@ -48,6 +53,9 @@ public class App {
             node2.adjacent.add(node1);
         }
 
+        Graph graph = new Graph();
+        graph.allNodes = new ArrayList<>(nodes.values());
+        graph.allNodes.get(0).visitOneCaveTwice=true;
         for (Node node : nodes.values()) {
             if ("start".equals(node.name)) {
                 graph.start = node;
@@ -73,7 +81,7 @@ public class App {
 
         for (Node next : adjacent) {
             var path = dfs(next, next.updateVisited(new HashSet<>(visited)));
-            result.addAll(path.stream().map(l -> new String(l + "-" +startNode.name)).collect(Collectors.toList()));
+            result.addAll(path.stream().map(l -> new String(startNode.name + "-" + l)).collect(Collectors.toList()));
         }
         return result;
     }
@@ -92,6 +100,7 @@ class Node {
     List<Node> adjacent = new ArrayList<>();
     String name;
     boolean bigCave = false;
+    boolean visitOneCaveTwice=false;
 
     Node(String name) {
         this.name = name;
@@ -103,14 +112,30 @@ class Node {
     }
 
     public Set<String> updateVisited(Set<String> visited) {
-        if(!bigCave)
-            visited.add(name);
-
+        if (!bigCave) {
+            if (!visitOneCaveTwice || visited.contains("smalcave")) {
+                visited.add(name);
+            } else {
+                visited.add("smalcave");
+            }
+        }
         return visited;
     }
 }
 
 class Graph {
+    int index=0;
     Node start;
     Node end;
+    List<Node> allNodes;
+
+    boolean nextSmallCave() {
+        if (index >= allNodes.size()-1)
+            return false;
+
+        allNodes.get(index).visitOneCaveTwice = false;
+        allNodes.get(++index).visitOneCaveTwice = true;
+
+        return true;
+    }
 }
