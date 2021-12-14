@@ -3,12 +3,13 @@ package aoc;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
 public class AppTest {
-    @BeforeAll static void init() throws IOException {
+    @BeforeEach void init() throws IOException {
         App.input = App.parseInput("testinput.txt");
     }
 

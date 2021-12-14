@@ -7,11 +7,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class AppTest {
 
-    @BeforeAll static void init() throws IOException {
+    @BeforeEach void init() throws IOException {
         App.input = App.parseInput("testinput.txt");
     }
 
