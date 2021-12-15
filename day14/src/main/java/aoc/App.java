@@ -18,8 +18,11 @@ public class App {
 
     public static long getSolutionPart2() {
         var polymer = createPolymer(input);
-        polymer.process(20);
-        return polymer.getScore();
+        var v1 = polymer.process2(new char[] {'N','N'}, 35);
+        var v2 = polymer.process2(new char[] {'N','C'}, 35);
+        var v3 = polymer.process2(new char[] {'C','C'}, 35);
+
+        return v1+v2+v3+1;
     }
 
     public static void main(String[] args) throws IOException {
@@ -36,7 +39,7 @@ public class App {
         polymer.startPolymer = input.get(0);
         for (int i=2;i<input.size();i++) {
             var mapping = input.get(i).split("->");
-            polymer.transform.put(mapping[0].trim(), mapping[1].trim());
+            polymer.transform.put(mapping[0].trim(), mapping[1].trim().charAt(0));
         }
 
         return polymer;
@@ -46,7 +49,7 @@ public class App {
 class Polymer {
     String startPolymer;
     String currentPolymer;
-    Map<String, String> transform = new HashMap<>();
+    Map<String, Character> transform = new HashMap<>();
 
     String process(int steps) {
         currentPolymer = startPolymer;
@@ -54,13 +57,32 @@ class Polymer {
         for (int i=0;i<steps;i++) {
             StringBuilder builder = new StringBuilder(currentPolymer);
             for(int pos=currentPolymer.length()-1;pos>0;pos--) {
-                String sub = transform.get(currentPolymer.substring(pos-1, pos+1));
+                String sub = String.valueOf(transform.get(currentPolymer.substring(pos-1, pos+1)));
                 builder.insert(pos, sub);
             }
             currentPolymer = builder.toString();
             System.out.println("Step: " + i);
         }
         return currentPolymer;
+    }
+
+    long process2(char[] pair, int steps) {
+        long count=0;
+
+        if (steps == 0)
+            return 0;
+
+        var insert = transform.get(new String(pair));
+        switch (insert) {
+            case 'B': count++; break;
+            //case "N": count[1]++; break;
+            //case "H": count[2]++; break;
+            //case "C": count[3]++; break;
+        }
+
+        var c1 = process2(new char[] {pair[0],insert}, steps - 1);
+        var c2 = process2(new char[] {insert, pair[1]}, steps - 1);
+        return c1+c2+count;
     }
 
     List<Long> getCount() {
