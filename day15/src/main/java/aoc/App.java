@@ -85,8 +85,7 @@ public class App {
                 }
             }
         }
-
-
+        
         input = grid;
     }
 

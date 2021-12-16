@@ -20,6 +20,6 @@ public class AppTest {
     }
 
     @Test void part2MultipliesInput() {
-        assertEquals(2192039569602l, App.getSolutionPart2());
+        assertEquals(2188189693529l, App.getSolutionPart2());
     }
 }

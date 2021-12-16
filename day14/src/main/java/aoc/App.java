@@ -12,17 +12,18 @@ public class App {
 
     public static long getSolutionPart1() {
         var polymer = createPolymer(input);
+
         polymer.process(10);
+
         return polymer.getScore();
     }
 
     public static long getSolutionPart2() {
         var polymer = createPolymer(input);
-        var v1 = polymer.process2(new char[] {'N','N'}, 35);
-        var v2 = polymer.process2(new char[] {'N','C'}, 35);
-        var v3 = polymer.process2(new char[] {'C','C'}, 35);
 
-        return v1+v2+v3+1;
+        polymer.process(40);
+
+        return polymer.getScore();
     }
 
     public static void main(String[] args) throws IOException {
@@ -35,75 +36,66 @@ public class App {
     }
 
     static Polymer createPolymer(List<String> input) {
-        Polymer polymer = new Polymer();
-        polymer.startPolymer = input.get(0);
+        Map<String, Long> count = new HashMap<>();
+        Map<String, String[]> transform = new HashMap<>();
+        String startPolymer = input.get(0);
+
         for (int i=2;i<input.size();i++) {
             var mapping = input.get(i).split("->");
-            polymer.transform.put(mapping[0].trim(), mapping[1].trim().charAt(0));
+            var polymer = mapping[0].trim();
+            var insertion = mapping[1].trim();
+
+            transform.put(polymer, new String[] {polymer.substring(0,1)+insertion, insertion + polymer.substring(1)});
+            count.put(polymer, 0l);
         }
+
+        for (int i=0;i<startPolymer.length()-1;i++) {
+            var polymer = startPolymer.substring(i, i+2);
+            Long value = count.get(polymer) + 1;
+            count.put(polymer, value++);
+        }
+
+        Polymer polymer = new Polymer();
+        polymer.transform = transform;
+        polymer.count = count;
 
         return polymer;
     }
 }
 
 class Polymer {
-    String startPolymer;
-    String currentPolymer;
-    Map<String, Character> transform = new HashMap<>();
+    Map<String, String[]> transform = new HashMap<>();
+    Map<String, Long> count = new HashMap<>();
 
-    String process(int steps) {
-        currentPolymer = startPolymer;
-
+    void process(int steps) {
         for (int i=0;i<steps;i++) {
-            StringBuilder builder = new StringBuilder(currentPolymer);
-            for(int pos=currentPolymer.length()-1;pos>0;pos--) {
-                String sub = String.valueOf(transform.get(currentPolymer.substring(pos-1, pos+1)));
-                builder.insert(pos, sub);
+            Map<String, Long> newCount = new HashMap<>();
+            for (Map.Entry<String,Long> entry: count.entrySet()) {
+                if (entry.getValue() > 0) {
+                    var newPolymers = transform.get(entry.getKey());
+                    var pol1Count = newCount.getOrDefault(newPolymers[0], 0l);
+                    var pol2Count = newCount.getOrDefault(newPolymers[1], 0l);
+                    newCount.put(newPolymers[0], entry.getValue() + pol1Count);
+                    newCount.put(newPolymers[1], entry.getValue() + pol2Count);
+                }
             }
-            currentPolymer = builder.toString();
-            System.out.println("Step: " + i);
+
+            count = newCount;
         }
-        return currentPolymer;
-    }
-
-    long process2(char[] pair, int steps) {
-        long count=0;
-
-        if (steps == 0)
-            return 0;
-
-        var insert = transform.get(new String(pair));
-        switch (insert) {
-            case 'B': count++; break;
-            //case "N": count[1]++; break;
-            //case "H": count[2]++; break;
-            //case "C": count[3]++; break;
-        }
-
-        var c1 = process2(new char[] {pair[0],insert}, steps - 1);
-        var c2 = process2(new char[] {insert, pair[1]}, steps - 1);
-        return c1+c2+count;
-    }
-
-    List<Long> getCount() {
-        long b=0, n=0, h=0, c=0;
-
-        for (char ch : currentPolymer.toCharArray()) {
-            switch (ch) {
-                case 'B': b++; break;
-                case 'N': n++; break;
-                case 'H': h++; break;
-                case 'C': c++; break;
-            }
-        }
-
-        return Arrays.asList(b,n,h,c);
     }
 
     long getScore() {
-        var list = getCount();
-        var sorted = list.stream().sorted().collect(Collectors.toList());
+        Map<Character, Long> score = new HashMap<>();
+        for (Map.Entry<String, Long> entry : count.entrySet()) {
+            for(char c : entry.getKey().toCharArray()) {
+                var value = score.getOrDefault(c, 0l);
+                value += entry.getValue();
+                score.put(c, value);
+            }
+        }
 
-        return sorted.get(sorted.size()-1) - sorted.get(0);
+        var sorted = score.values().stream().map(v -> Math.ceil(v/2.0)).sorted().collect(Collectors.toList());
+
+        return sorted.get(sorted.size()-1).longValue() - sorted.get(0).longValue();
     }
 }
